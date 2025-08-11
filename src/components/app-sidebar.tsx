@@ -33,9 +33,10 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "Panel",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
+      url: "/dashboard",
     }
   ],
   navMain: [
