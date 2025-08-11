@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   Dialog,
   DialogContent,
@@ -19,57 +18,25 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarDays, MoreVertical, Plus, Edit, Trash2, FolderOpen } from "lucide-react"
-import { format, isSameDay } from "date-fns"
+import { CalendarDays, Plus, Edit, Trash2, FolderOpen } from "lucide-react"
+import { format, isSameDay} from "date-fns"
 import { es } from "date-fns/locale"
 
+
 interface Project {
-  id: string
+  _id: string
   title: string
   description: string
-  status: "pendiente" | "en-progreso" | "completado"
-  priority: "baja" | "media" | "alta"
+  status: "Pendiente" | "En-Progreso" | "Completado"
+  priority: "Baja" | "Media" | "Alta"
   dueDate: Date
   createdAt: Date
   assignedTo: string
 }
 
-const initialProjects: Project[] = [
-  {
-    id: "1",
-    title: "Diseño de Landing Page",
-    description: "Crear el diseño responsive para la nueva landing page del producto",
-    status: "en-progreso",
-    priority: "alta",
-    dueDate: new Date(),
-    createdAt: new Date(),
-    assignedTo: "María García",
-  },
-  {
-    id: "2",
-    title: "Integración API de Pagos",
-    description: "Implementar la integración con Stripe para procesar pagos",
-    status: "pendiente",
-    priority: "media",
-    dueDate: new Date(Date.now() + 86400000),
-    createdAt: new Date(),
-    assignedTo: "Carlos López",
-  },
-  {
-    id: "3",
-    title: "Testing de Componentes",
-    description: "Escribir tests unitarios para los componentes principales",
-    status: "completado",
-    priority: "baja",
-    dueDate: new Date(Date.now() - 86400000),
-    createdAt: new Date(),
-    assignedTo: "Ana Martínez",
-  },
-]
-
 export default function ProjectCalendarView() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
-  const [projects, setProjects] = useState<Project[]>(initialProjects)
+  const [projects, setProjects] = useState<Project[]>([])
   const [showAllProjects, setShowAllProjects] = useState(false)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -77,8 +44,8 @@ export default function ProjectCalendarView() {
   const [newProject, setNewProject] = useState<NewProjectForm>({
     title: "",
     description: "",
-    status: "pendiente",
-    priority: "media",
+    status: "Pendiente",
+    priority: "Media",
     dueDate: new Date(),
     assignedTo: "",
   })
@@ -92,24 +59,40 @@ export default function ProjectCalendarView() {
       : []
 
 
-      type NewProjectForm = Omit<Project, "id" | "createdAt">;
+      type NewProjectForm = Omit<Project, "_id" | "createdAt">;
 
-  const handleAddProject = () => {
-    const project: Project = {
-      id: Date.now().toString(),
-      ...newProject,
-      createdAt: new Date(),
-    }
-    setProjects([...projects, project])
+  const handleAddProject = async () => {
+    
+    try {
+      const response = await fetch("http://localhost:5000/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newProject),
+      })
+      
+      if (!response.ok) {
+        throw new Error("Error al crear el proyecto")
+      }
+      const projectData = await response.json();
+      setProjects((prev) => [...prev, projectData.project]);
+      alert("Proyecto creado exitosamente")
     setNewProject({
       title: "",
       description: "",
-      status: "pendiente",
-      priority: "media",
+      status: "Pendiente",
+      priority: "Media",
       dueDate: new Date(),
       assignedTo: "",
     })
+
     setIsAddDialogOpen(false)
+    
+  } catch (error) {
+    console.error("Error al agregar el proyecto:", error)
+    alert("No se pudo agregar el proyecto. Por favor, inténtalo de nuevo.")
+  }
   }
 
   const handleEditProject = (project: Project) => {
@@ -117,25 +100,57 @@ export default function ProjectCalendarView() {
     setIsEditDialogOpen(true)
   }
 
-  const handleUpdateProject = () => {
+  const handleUpdateProject = async () => {
     if (!editingProject) return
+    try {
+      const response = await fetch(`http://localhost:5000/api/projects/${editingProject._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editingProject),
+      })
+      if (!response.ok) {
+        throw new Error("Error al actualizar el proyecto")
+      }
+      const result = await response.json()
+      setProjects(projects.map((p) => (p._id === editingProject._id ? result.project : p)))
+      setEditingProject(null)
+      setIsEditDialogOpen(false)
+      alert("Proyecto actualizado exitosamente")
+    } catch (error) {
+      console.error("Error al actualizar el proyecto:", error)
+      alert("No se pudo actualizar el proyecto. Por favor, inténtalo de nuevo.")
+    }
 
-    setProjects(projects.map((p) => (p.id === editingProject.id ? editingProject : p)))
-    setEditingProject(null)
-    setIsEditDialogOpen(false)
+    
   }
 
-  const handleDeleteProject = (projectId: string) => {
-    setProjects(projects.filter((p) => p.id !== projectId))
+  const handleDeleteProject = async (projectId: string) => {
+    setProjects(projects.filter((p) => p._id !== projectId))
+    try {
+      const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) {
+        throw new Error("Error al eliminar el proyecto")
+      }
+      alert("Proyecto eliminado exitosamente")
+      setProjects(projects.filter((p) => p._id !== projectId))
+    } catch (error) {
+      console.error("Error al eliminar el proyecto:", error)
+      alert("No se pudo eliminar el proyecto. Por favor, inténtalo de nuevo.")
+    }
+    
   }
 
   const getStatusColor = (status: Project["status"]) => {
     switch (status) {
-      case "completado":
+      case "Completado":
         return "bg-green-100 text-green-800 hover:bg-green-200"
-      case "en-progreso":
+      case "En-Progreso":
         return "bg-blue-100 text-blue-800 hover:bg-blue-200"
-      case "pendiente":
+      case "Pendiente":
         return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -144,11 +159,11 @@ export default function ProjectCalendarView() {
 
   const getPriorityColor = (priority: Project["priority"]) => {
     switch (priority) {
-      case "alta":
+      case "Alta":
         return "bg-red-100 text-red-800 hover:bg-red-200"
-      case "media":
+      case "Media":
         return "bg-orange-100 text-orange-800 hover:bg-orange-200"
-      case "baja":
+      case "Baja":
         return "bg-gray-100 text-gray-800 hover:bg-gray-200"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -160,14 +175,41 @@ export default function ProjectCalendarView() {
     setIsDetailsDialogOpen(true)
   }
 
-  const handleStatusChange = (newStatus: Project["status"]) => {
+  const handleStatusChange = async (newStatus: Project["status"]) => {
     if (!selectedProject) return
 
     const updatedProject = { ...selectedProject, status: newStatus }
-    setProjects(projects.map((p) => (p.id === selectedProject.id ? updatedProject : p)))
-    setSelectedProject(updatedProject)
+    try {
+      const response = await fetch(`http://localhost:5000/api/projects/${selectedProject._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) {
+        throw new Error("Error al actualizar el estado del proyecto")
+      }
+      const data = await response.json()
+      setProjects(projects.map((p) => (p._id === selectedProject._id ? updatedProject : p)))
+      setSelectedProject(data.project);
+      alert(`Estado del proyecto actualizado a ${newStatus}`)
+    } catch (error) {
+      console.error("Error al actualizar el estado del proyecto:", error)
+      alert("No se pudo actualizar el estado del proyecto. Por favor, inténtalo de nuevo.")
+    }
+    
   }
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+    const response = await fetch("http://localhost:5000/api/projects")
+    const data = await response.json()
+    setProjects(data)
+    }
+    fetchProjects()
+  }, [])
+  
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <div className="flex flex-col xl:flex-row gap-6">
@@ -228,95 +270,124 @@ export default function ProjectCalendarView() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Agregar Nuevo Proyecto</DialogTitle>
-                    <DialogDescription>Completa los campos para crear un nuevo proyecto.</DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="title">Título</Label>
-                      <Input
-                        id="title"
-                        value={newProject.title}
-                        onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
-                        placeholder="Nombre del proyecto"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="description">Descripción</Label>
-                      <Textarea
-                        id="description"
-                        value={newProject.description}
-                        onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                        placeholder="Describe el proyecto"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleAddProject();
+                    }}
+                  >
+                    <DialogHeader>
+                      <DialogTitle>Agregar Nuevo Proyecto</DialogTitle>
+                      <DialogDescription>
+                        Completa los campos para crear un nuevo proyecto.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
-                        <Label htmlFor="status">Estado</Label>
-                        <Select
-                          value={newProject.status}
-                          onValueChange={(value: Project["status"]) => setNewProject({ ...newProject, status: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pendiente">Pendiente</SelectItem>
-                            <SelectItem value="en-progreso">En Progreso</SelectItem>
-                            <SelectItem value="completado">Completado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="priority">Prioridad</Label>
-                        <Select
-                          value={newProject.priority}
-                          onValueChange={(value: Project["priority"]) =>
-                            setNewProject({ ...newProject, priority: value })
+                        <Label htmlFor="title">Título</Label>
+                        <Input
+                          id="title"
+                          value={newProject.title}
+                          onChange={(e) =>
+                            setNewProject({ ...newProject, title: e.target.value })
                           }
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="baja">Baja</SelectItem>
-                            <SelectItem value="media">Media</SelectItem>
-                            <SelectItem value="alta">Alta</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          placeholder="Nombre del proyecto"
+                          required
+                        />
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="description">Descripción</Label>
+                        <Textarea
+                          id="description"
+                          value={newProject.description}
+                          onChange={(e) =>
+                            setNewProject({ ...newProject, description: e.target.value })
+                          }
+                          placeholder="Describe el proyecto"
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="status">Estado</Label>
+                          <Select
+                            value={newProject.status}
+                            onValueChange={(value: Project["status"]) =>
+                              setNewProject({ ...newProject, status: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Pendiente">Pendiente</SelectItem>
+                              <SelectItem value="En-Progreso">En Progreso</SelectItem>
+                              <SelectItem value="Completado">Completado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="grid gap-2">
+                          <Label htmlFor="priority">Prioridad</Label>
+                          <Select
+                            value={newProject.priority}
+                            onValueChange={(value: Project["priority"]) =>
+                              setNewProject({ ...newProject, priority: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Baja">Baja</SelectItem>
+                              <SelectItem value="Media">Media</SelectItem>
+                              <SelectItem value="Alta">Alta</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="dueDate">Fecha de Vencimiento</Label>
+                        <Input
+                          id="dueDate"
+                          type="date"
+                          value={format(newProject.dueDate, "yyyy-MM-dd")}
+                          onChange={(e) =>
+                            setNewProject({
+                              ...newProject,
+                              dueDate: new Date(e.target.value),
+                            })
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="assignedTo">Persona Asignada</Label>
+                        <Input
+                          id="assignedTo"
+                          value={newProject.assignedTo}
+                          onChange={(e) =>
+                            setNewProject({ ...newProject, assignedTo: e.target.value })
+                          }
+                          placeholder="Nombre de la persona asignada"
+                          required
+                        />
                       </div>
                     </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="dueDate">Fecha de Vencimiento</Label>
-                      <Input
-                        id="dueDate"
-                        type="date"
-                        value={format(newProject.dueDate, "yyyy-MM-dd")}
-                        onChange={(e) =>
-                          setNewProject({
-                            ...newProject,
-                            dueDate: new Date(e.target.value),
-                          })
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="assignedTo">Persona Asignada</Label>
-                      <Input
-                        id="assignedTo"
-                        value={newProject.assignedTo}
-                        onChange={(e) => setNewProject({ ...newProject, assignedTo: e.target.value })}
-                        placeholder="Nombre de la persona asignada"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit" onClick={handleAddProject}>
-                      Crear Proyecto
-                    </Button>
-                  </DialogFooter>
+
+                    <DialogFooter>
+                      <Button type="submit">
+                        Crear Proyecto
+                      </Button>
+                    </DialogFooter>
+                  </form>
                 </DialogContent>
+
               </Dialog>
             </div>
           </div>
@@ -336,7 +407,7 @@ export default function ProjectCalendarView() {
             ) : (
               filteredProjects.map((project) => (
                 <Card
-                  key={project.id}
+                  key={project._id}
                   className="hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => handleProjectClick(project)}
                 >
@@ -346,14 +417,14 @@ export default function ProjectCalendarView() {
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-lg font-semibold">{project.title}</h3>
                           <Badge className={getStatusColor(project.status)}>
-                            {project.status === "en-progreso"
+                            {project.status === "En-Progreso"
                               ? "En Progreso"
-                              : project.status === "completado"
+                              : project.status === "Completado"
                                 ? "Completado"
                                 : "Pendiente"}
                           </Badge>
                           <Badge variant="outline" className={getPriorityColor(project.priority)}>
-                            {project.priority === "alta" ? "Alta" : project.priority === "media" ? "Media" : "Baja"}
+                            {project.priority === "Alta" ? "Alta" : project.priority === "Media" ? "Media" : "Baja"}
                           </Badge>
                         </div>
                         <p className="text-muted-foreground mb-3">{project.description}</p>
@@ -363,23 +434,7 @@ export default function ProjectCalendarView() {
                         </div>
                       </div>
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEditProject(project)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteProject(project.id)} className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Eliminar
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      
                     </div>
                   </CardContent>
                 </Card>
@@ -410,9 +465,9 @@ export default function ProjectCalendarView() {
                   <Label className="text-sm font-medium">Estado Actual</Label>
                   <div className="mt-2">
                     <Badge className={getStatusColor(selectedProject.status)}>
-                      {selectedProject.status === "en-progreso"
+                      {selectedProject.status === "En-Progreso"
                         ? "En Progreso"
-                        : selectedProject.status === "completado"
+                        : selectedProject.status === "Completado"
                           ? "Completado"
                           : "Pendiente"}
                     </Badge>
@@ -422,9 +477,9 @@ export default function ProjectCalendarView() {
                   <Label className="text-sm font-medium">Prioridad</Label>
                   <div className="mt-2">
                     <Badge variant="outline" className={getPriorityColor(selectedProject.priority)}>
-                      {selectedProject.priority === "alta"
+                      {selectedProject.priority === "Alta"
                         ? "Alta"
-                        : selectedProject.priority === "media"
+                        : selectedProject.priority === "Media"
                           ? "Media"
                           : "Baja"}
                     </Badge>
@@ -447,23 +502,23 @@ export default function ProjectCalendarView() {
                 <Label className="text-sm font-medium mb-3 block">Cambiar Estado</Label>
                 <div className="flex gap-2">
                   <Button
-                    variant={selectedProject.status === "pendiente" ? "default" : "outline"}
+                    variant={selectedProject.status === "Pendiente" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handleStatusChange("pendiente")}
+                    onClick={() => handleStatusChange("Pendiente")}
                   >
                     Pendiente
                   </Button>
                   <Button
-                    variant={selectedProject.status === "en-progreso" ? "default" : "outline"}
+                    variant={selectedProject.status === "En-Progreso" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handleStatusChange("en-progreso")}
+                    onClick={() => handleStatusChange("En-Progreso")}
                   >
                     En Progreso
                   </Button>
                   <Button
-                    variant={selectedProject.status === "completado" ? "default" : "outline"}
+                    variant={selectedProject.status === "Completado" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handleStatusChange("completado")}
+                    onClick={() => handleStatusChange("Completado")}
                   >
                     Completado
                   </Button>
@@ -485,7 +540,7 @@ export default function ProjectCalendarView() {
                 <Button
                   variant="destructive"
                   onClick={() => {
-                    handleDeleteProject(selectedProject.id)
+                    handleDeleteProject(selectedProject._id)
                     setIsDetailsDialogOpen(false)
                   }}
                   className="flex items-center gap-2"
@@ -547,9 +602,9 @@ export default function ProjectCalendarView() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pendiente">Pendiente</SelectItem>
-                      <SelectItem value="en-progreso">En Progreso</SelectItem>
-                      <SelectItem value="completado">Completado</SelectItem>
+                      <SelectItem value="Pendiente">Pendiente</SelectItem>
+                      <SelectItem value="En-Progreso">En Progreso</SelectItem>
+                      <SelectItem value="Completado">Completado</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -565,9 +620,9 @@ export default function ProjectCalendarView() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="baja">Baja</SelectItem>
-                      <SelectItem value="media">Media</SelectItem>
-                      <SelectItem value="alta">Alta</SelectItem>
+                      <SelectItem value="Baja">Baja</SelectItem>
+                      <SelectItem value="Media">Media</SelectItem>
+                      <SelectItem value="Alta">Alta</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

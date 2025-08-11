@@ -16,7 +16,7 @@ import { Mail, Phone, MapPin, Calendar, Briefcase, Star, Plus, X, Search, Edit }
 
 
 interface Person {
-  id: number
+  _id: string 
   name: string
   role: string
   department: string
@@ -31,188 +31,6 @@ interface Person {
   projects: number
 }
 
-const initialPeople: Person[] = [
-  {
-    id: 1,
-    name: "Ana García",
-    role: "Desarrolladora Frontend",
-    department: "Tecnología",
-    avatar: "/placeholder.svg?height=100&width=100",
-    email: "ana.garcia@empresa.com",
-    phone: "+34 612 345 678",
-    location: "Madrid, España",
-    joinDate: "2022-03-15",
-    bio: "Desarrolladora frontend especializada en React y TypeScript con más de 4 años de experiencia. Apasionada por crear interfaces de usuario intuitivas y accesibles.",
-    skills: ["React", "TypeScript", "Next.js", "Tailwind CSS", "Figma"],
-    rating: 4.8,
-    projects: 12,
-  },
-  {
-    id: 2,
-    name: "Carlos Rodríguez",
-    role: "Diseñador UX/UI",
-    department: "Diseño",
-    avatar: "/placeholder.svg?height=100&width=100",
-    email: "carlos.rodriguez@empresa.com",
-    phone: "+34 623 456 789",
-    location: "Barcelona, España",
-    joinDate: "2021-08-20",
-    bio: "Diseñador UX/UI con enfoque en investigación de usuarios y diseño centrado en el usuario. Experto en crear experiencias digitales memorables.",
-    skills: ["Figma", "Adobe XD", "Sketch", "Prototyping", "User Research"],
-    rating: 4.9,
-    projects: 18,
-  },
-  {
-    id: 3,
-    name: "María López",
-    role: "Product Manager",
-    department: "Producto",
-    avatar: "/placeholder.svg?height=100&width=100",
-    email: "maria.lopez@empresa.com",
-    phone: "+34 634 567 890",
-    location: "Valencia, España",
-    joinDate: "2020-11-10",
-    bio: "Product Manager con experiencia en metodologías ágiles y gestión de equipos multidisciplinarios. Especializada en productos digitales B2B.",
-    skills: ["Scrum", "Jira", "Analytics", "Strategy", "Leadership"],
-    rating: 4.7,
-    projects: 25,
-  },
-  {
-    id: 4,
-    name: "David Martín",
-    role: "Desarrollador Backend",
-    department: "Tecnología",
-    avatar: "/placeholder.svg?height=100&width=100",
-    email: "david.martin@empresa.com",
-    phone: "+34 645 678 901",
-    location: "Sevilla, España",
-    joinDate: "2023-01-12",
-    bio: "Desarrollador backend especializado en Node.js y bases de datos. Enfocado en crear APIs robustas y escalables para aplicaciones de alto rendimiento.",
-    skills: ["Node.js", "PostgreSQL", "Docker", "AWS", "GraphQL"],
-    rating: 4.6,
-    projects: 8,
-  },
-  {
-    id: 5,
-    name: "Laura Sánchez",
-    role: "Data Analyst",
-    department: "Analytics",
-    avatar: "/placeholder.svg?height=100&width=100",
-    email: "laura.sanchez@empresa.com",
-    phone: "+34 656 789 012",
-    location: "Bilbao, España",
-    joinDate: "2022-07-03",
-    bio: "Analista de datos con experiencia en visualización de datos y machine learning. Especializada en convertir datos complejos en insights accionables.",
-    skills: ["Python", "SQL", "Tableau", "Power BI", "Machine Learning"],
-    rating: 4.8,
-    projects: 15,
-  },
-  {
-    id: 6,
-    name: "Javier Fernández",
-    role: "DevOps Engineer",
-    department: "Infraestructura",
-    avatar: "/placeholder.svg?height=100&width=100",
-    email: "javier.fernandez@empresa.com",
-    phone: "+34 667 890 123",
-    location: "Zaragoza, España",
-    joinDate: "2021-12-05",
-    bio: "Ingeniero DevOps especializado en automatización y despliegue continuo. Experto en infraestructura como código y monitorización de sistemas.",
-    skills: ["Kubernetes", "Terraform", "Jenkins", "Monitoring", "Linux"],
-    rating: 4.9,
-    projects: 20,
-  },
-  {
-    id: 7,
-    name: "Elena Ruiz",
-    role: "Marketing Manager",
-    department: "Marketing",
-    avatar: "/placeholder.svg?height=120&width=120",
-    email: "elena.ruiz@empresa.com",
-    phone: "+34 678 901 234",
-    location: "Málaga, España",
-    joinDate: "2022-02-14",
-    bio: "Marketing Manager especializada en marketing digital y growth hacking. Experta en campañas multicanal y análisis de métricas de conversión.",
-    skills: ["Google Ads", "SEO", "Analytics", "Social Media", "Growth Hacking"],
-    rating: 4.7,
-    projects: 22,
-  },
-  {
-    id: 8,
-    name: "Roberto Silva",
-    role: "QA Engineer",
-    department: "Calidad",
-    avatar: "/placeholder.svg?height=120&width=120",
-    email: "roberto.silva@empresa.com",
-    phone: "+34 689 012 345",
-    location: "Vigo, España",
-    joinDate: "2021-09-30",
-    bio: "Ingeniero de QA con experiencia en testing automatizado y manual. Especializado en garantizar la calidad del software mediante pruebas exhaustivas.",
-    skills: ["Selenium", "Jest", "Cypress", "Manual Testing", "API Testing"],
-    rating: 4.8,
-    projects: 16,
-  },
-  {
-    id: 9,
-    name: "Carmen Torres",
-    role: "HR Business Partner",
-    department: "Recursos Humanos",
-    avatar: "/placeholder.svg?height=120&width=120",
-    email: "carmen.torres@empresa.com",
-    phone: "+34 690 123 456",
-    location: "Granada, España",
-    joinDate: "2020-05-18",
-    bio: "HR Business Partner enfocada en desarrollo del talento y cultura organizacional. Especialista en procesos de selección y retención de talento.",
-    skills: ["Talent Management", "Recruiting", "Performance", "Culture", "Leadership"],
-    rating: 4.9,
-    projects: 30,
-  },
-  {
-    id: 10,
-    name: "Alejandro Moreno",
-    role: "Sales Manager",
-    department: "Ventas",
-    avatar: "/placeholder.svg?height=120&width=120",
-    email: "alejandro.moreno@empresa.com",
-    phone: "+34 601 234 567",
-    location: "Murcia, España",
-    joinDate: "2023-04-10",
-    bio: "Sales Manager con amplia experiencia en ventas B2B y gestión de cuentas estratégicas. Especializado en el desarrollo de nuevos mercados.",
-    skills: ["CRM", "Salesforce", "Negotiation", "B2B Sales", "Account Management"],
-    rating: 4.6,
-    projects: 14,
-  },
-  {
-    id: 11,
-    name: "Sofía Jiménez",
-    role: "Content Creator",
-    department: "Marketing",
-    avatar: "/placeholder.svg?height=120&width=120",
-    email: "sofia.jimenez@empresa.com",
-    phone: "+34 612 345 678",
-    location: "Palma, España",
-    joinDate: "2022-11-22",
-    bio: "Content Creator especializada en storytelling y creación de contenido multimedia. Experta en redes sociales y marketing de contenidos.",
-    skills: ["Content Strategy", "Video Editing", "Photography", "Copywriting", "Social Media"],
-    rating: 4.8,
-    projects: 19,
-  },
-  {
-    id: 12,
-    name: "Miguel Herrera",
-    role: "Security Engineer",
-    department: "Seguridad",
-    avatar: "/placeholder.svg?height=120&width=120",
-    email: "miguel.herrera@empresa.com",
-    phone: "+34 623 456 789",
-    location: "Santander, España",
-    joinDate: "2021-06-07",
-    bio: "Ingeniero de seguridad especializado en ciberseguridad y protección de infraestructuras. Experto en análisis de vulnerabilidades y respuesta a incidentes.",
-    skills: ["Cybersecurity", "Penetration Testing", "SIEM", "Incident Response", "Risk Assessment"],
-    rating: 4.9,
-    projects: 21,
-  },
-]
 
 const departments = [
   "Tecnología",
@@ -228,8 +46,7 @@ const departments = [
 ]
 
 export default function Dashboard() {
-  const [personas, setPersonas] = useState<Person[]>(initialPeople)
-  const [people, setPeople] = useState<Person[]>(initialPeople)
+  const [personas, setPersonas] = useState<Person[]>([])
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [newPerson, setNewPerson] = useState({
@@ -296,7 +113,7 @@ export default function Dashboard() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const skillsArray = newPerson.skills
@@ -304,8 +121,7 @@ export default function Dashboard() {
       .map((skill) => skill.trim())
       .filter((skill) => skill.length > 0)
 
-    const personToAdd: Person = {
-      id: Math.max(...people.map((p) => p.id)) + 1,
+    const personToAdd = {
       name: newPerson.name,
       role: newPerson.role,
       department: newPerson.department,
@@ -320,14 +136,46 @@ export default function Dashboard() {
       projects: newPerson.projects,
     }
 
-    setPeople((prev) => [...prev, personToAdd])
-    setShowEditOption(personToAdd)
-    closeAddModal()
+    try {
+      const response = await fetch("http://localhost:5000/api/personas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(personToAdd),
+      })
+      if (!response.ok) {
+        throw new Error("Error al agregar el perfil")
+      }
+      const responseData  = await response.json()
+      const person = responseData.person
+      setPersonas((prev) => [...prev, person])
+      setShowEditOption(person)
+      closeAddModal()
+    } catch (error) {
+      console.error("Error adding person:", error)
+      alert("Hubo un error al agregar el perfil. Por favor, inténtalo de nuevo.")
+    }
+
   }
 
-  const handleDeletePerson = (personId: number) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este perfil?")) {
-      setPeople((prev) => prev.filter((person) => person.id !== personId))
+  const handleDeletePerson = async (id: string) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este perfil? Esta acción no se puede deshacer.")) {
+      return
+    }
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/personas/${id}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) {
+        throw new Error("Error al eliminar el perfil")
+      }
+      setPersonas((prev) => prev.filter((person) => person._id !== id))
+      alert("Perfil eliminado correctamente");
+    } catch (error) {
+      console.error("Error deleting person:", error)
+      alert("Hubo un error al eliminar el perfil. Por favor, inténtalo de nuevo.")
     }
   }
 
@@ -373,17 +221,15 @@ export default function Dashboard() {
     }))
   }
 
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!editingPerson) return
-
+    if (!editingPerson|| !editingPerson._id) return
     const skillsArray = editFormData.skills
       .split(",")
       .map((skill) => skill.trim())
       .filter((skill) => skill.length > 0)
-
-    const updatedPerson: Person = {
+    
+    const updatedPersonData : Person = {
       ...editingPerson,
       name: editFormData.name,
       role: editFormData.role,
@@ -395,29 +241,49 @@ export default function Dashboard() {
       skills: skillsArray,
       rating: editFormData.rating,
       projects: editFormData.projects,
+      _id: editingPerson._id,
+      avatar: editingPerson.avatar || "/placeholder.svg?height=120&width=120",
+      joinDate: editingPerson.joinDate || new Date().toISOString().split("T")[0],
     }
-
-    setPeople((prev) => prev.map((person) => (person.id === editingPerson.id ? updatedPerson : person)))
-    closeEditModal()
+    try {
+      const response = await fetch(`http://localhost:5000/api/personas/${editingPerson._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedPersonData ),
+      })
+      if (!response.ok) {
+        throw new Error("Error al editar el perfil")
+      }
+      const { person: updatedPerson } = await response.json()
+      setPersonas((prev) =>
+        prev.map((person) => (person._id === updatedPerson._id ? updatedPerson : person))
+      )
+      console.log("Persona seleccionada para editar:", personas)
+      closeEditModal()
+    } catch (error) {
+      console.error("Error editing person:", error)
+      alert("Hubo un error al editar el perfil. Por favor, inténtalo de nuevo.")
+    }
   }
 
-  const filteredPeople = people.filter((person) => {
-    const searchLower = searchTerm.toLowerCase()
-    return (
-      person.name.toLowerCase().includes(searchLower) ||
-      person.role.toLowerCase().includes(searchLower) ||
-      person.department.toLowerCase().includes(searchLower) ||
-      person.email.toLowerCase().includes(searchLower) ||
-      person.location.toLowerCase().includes(searchLower) ||
-      person.skills.some((skill) => skill.toLowerCase().includes(searchLower))
-    )
-  })
   useEffect(() => {
-    fetch("http://localhost:5000/api/personas")
-    .then((response) => response.json())
-    .then((data) => setPersonas(data))
-    .catch((error) => console.error("Error fetching personas:", error))
-  }, [])
+  const fetchSearchResults = async () => {
+    if (searchTerm.trim() === "") {
+      // si está vacío, carga todos
+      const res = await fetch("http://localhost:5000/api/personas")
+      const data = await res.json()
+      setPersonas(data)
+    } else {
+      const response = await fetch(`http://localhost:5000/api/personas/search?query=${searchTerm}`)
+      const data = await response.json()
+      setPersonas(data)
+    }
+  }
+  fetchSearchResults()
+}, [searchTerm])
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -453,14 +319,15 @@ export default function Dashboard() {
               className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative"
             >
               <Button
-                onClick={() => handleDeletePerson(personas.id)}
+                onClick={() => handleDeletePerson(personas._id)}
                 variant="ghost"
-                size="sm"
+                size="sm" 
                 className="absolute top-2 right-2 z-10 h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
               >
                 <X className="w-4 h-4" />
               </Button>
               <Button
+                key={personas._id}
                 onClick={() => handleEditPerson(personas)}
                 variant="ghost"
                 size="sm"
@@ -489,7 +356,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-center gap-2 mb-6">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                   <span className="text-lg font-semibold">{personas.rating}</span>
-                  <span className="text-gray-500">({personas.projects}proyectos)</span>
+                  <span className="text-gray-500">({personas.projects} proyectos)</span>
                 </div>
                 <Button onClick={() => openModal(personas)} className="w-full py-3 text-lg">
                   Ver más información
@@ -499,7 +366,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {filteredPeople.length === 0 && searchTerm && (
+        {personas.length === 0 && searchTerm && (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">No se encontraron perfiles que coincidan con "{searchTerm}"</p>
           </div>

@@ -6,6 +6,7 @@ import { config } from 'dotenv';
 import cors from 'cors';
 import productRoutes from './routes/productRoutes.js';
 import personRoutes from './routes/personRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 
 config(); // carga las variables de entorno
 
@@ -19,6 +20,7 @@ app.use(express.json());
 // Rutas de productos
 app.use('/api/personas', personRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/projects', projectRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

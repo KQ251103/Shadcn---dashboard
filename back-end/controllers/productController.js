@@ -9,7 +9,6 @@ export const createProduct = async (req, res) => {
         console.error('Error al crear el producto:', error);
         res.status(500).json({ message: 'Error al crear el producto' });
     };
-    
 }
 export const getAllProducts = async (req, res) => {
     try {

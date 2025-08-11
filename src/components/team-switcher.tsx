@@ -44,24 +44,34 @@ export function TeamSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="w-full data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex justify-between items-center overflow-visible"
             >
+              {/* Logo */}
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <activeTeam.logo className="size-4" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight ">
+
+              {/* Nombre y plan */}
+              <div className="flex flex-col flex-1 text-left text-sm leading-tight ml-2">
                 <span className="truncate font-medium">{activeTeam.name}</span>
                 <span className="truncate text-xs">{activeTeam.plan}</span>
               </div>
-             
-              
-              <div className="flex justify-end">
-               <ModeToggle/>
+
+              {/* Wrapper del ModeToggle: parar propagation en varios eventos */}
+              <div
+                className="flex items-center justify-end ml-2 relative z-20"
+                onPointerDown={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                role="button"
+                tabIndex={0}
+              >
+                <ModeToggle />
               </div>
             </SidebarMenuButton>
-          
           </DropdownMenuTrigger>
-        
+
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             align="start"
@@ -85,16 +95,8 @@ export function TeamSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
+            
           </DropdownMenuContent>
-           <div className="flex justify-end">
-               <ModeToggle/>
-              </div>
 
             
         </DropdownMenu>

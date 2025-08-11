@@ -10,17 +10,31 @@ export const getAllPersons = async (req, res) => {
     }
 }
 export const getPersonById = async (req, res) => {
-    try {
-        const person = await Person.findById(req.params.id);
-        if (!person) {
-            return res.status(404).json({ message: 'Persona no encontrada' });
-        }
-        res.status(200).json(person);
-    } catch (error) {
-        console.error('Error al obtener la persona:', error);
-        res.status(500).json({ message: 'Error al obtener la persona' });
+  try {
+    const { query } = req.query // viene de ?query=nombre
+
+    if (!query) {
+      return res.status(400).json({ message: "Falta el término de búsqueda." })
     }
-};
+
+    const searchRegex = new RegExp(query, "i") // "i" para ignorar mayúsculas/minúsculas
+
+    const results = await Person.find({
+      $or: [
+        { name: searchRegex },
+        { role: searchRegex },
+        { department: searchRegex },
+        { email: searchRegex },
+        { location: searchRegex },
+        { skills: { $elemMatch: { $regex: searchRegex } } }
+      ]
+    })
+
+    res.json(results)
+  } catch (error) {
+    res.status(500).json({ message: "Error al buscar perfiles.", error })
+  }
+}
 export const createPerson = async (req, res) => {
     try {
         const person = new Person(req.body);
