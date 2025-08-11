@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Mail, Phone, MapPin, Calendar, Briefcase, Star, Plus, X, Search, Edit } from "lucide-react"
+
 
 interface Person {
   id: number
@@ -227,6 +228,7 @@ const departments = [
 ]
 
 export default function Dashboard() {
+  const [personas, setPersonas] = useState<Person[]>(initialPeople)
   const [people, setPeople] = useState<Person[]>(initialPeople)
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -410,6 +412,12 @@ export default function Dashboard() {
       person.skills.some((skill) => skill.toLowerCase().includes(searchLower))
     )
   })
+  useEffect(() => {
+    fetch("http://localhost:5000/api/personas")
+    .then((response) => response.json())
+    .then((data) => setPersonas(data))
+    .catch((error) => console.error("Error fetching personas:", error))
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -439,13 +447,13 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {filteredPeople.map((person) => (
+          {personas.map((personas,index) => (
             <Card
-              key={person.id}
+              key={index}
               className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative"
             >
               <Button
-                onClick={() => handleDeletePerson(person.id)}
+                onClick={() => handleDeletePerson(personas.id)}
                 variant="ghost"
                 size="sm"
                 className="absolute top-2 right-2 z-10 h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
@@ -453,7 +461,7 @@ export default function Dashboard() {
                 <X className="w-4 h-4" />
               </Button>
               <Button
-                onClick={() => handleEditPerson(person)}
+                onClick={() => handleEditPerson(personas)}
                 variant="ghost"
                 size="sm"
                 className="absolute top-2 right-10 z-10 h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
@@ -463,27 +471,27 @@ export default function Dashboard() {
 
               <CardHeader className="text-center pb-6">
                 <Avatar className="w-28 h-28 mx-auto mb-6">
-                  <AvatarImage src={person.avatar || "/placeholder.svg"} alt={person.name} />
+                  <AvatarImage src={personas.avatar || "/placeholder.svg"} alt={personas.name} />
                   <AvatarFallback className="text-2xl">
-                    {person.name
+                    {personas.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{person.name}</h3>
-                <p className="text-lg text-gray-600 mb-3">{person.role}</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{personas.name}</h3>
+                <p className="text-lg text-gray-600 mb-3">{personas.role}</p>
                 <Badge variant="secondary" className="w-fit mx-auto text-sm px-3 py-1">
-                  {person.department}
+                  {personas.department}
                 </Badge>
               </CardHeader>
               <CardContent className="text-center px-6 pb-6">
                 <div className="flex items-center justify-center gap-2 mb-6">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="text-lg font-semibold">{person.rating}</span>
-                  <span className="text-gray-500">({person.projects} proyectos)</span>
+                  <span className="text-lg font-semibold">{personas.rating}</span>
+                  <span className="text-gray-500">({personas.projects}proyectos)</span>
                 </div>
-                <Button onClick={() => openModal(person)} className="w-full py-3 text-lg">
+                <Button onClick={() => openModal(personas)} className="w-full py-3 text-lg">
                   Ver más información
                 </Button>
               </CardContent>
