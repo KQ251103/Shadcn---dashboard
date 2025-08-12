@@ -47,9 +47,7 @@ export function TeamSwitcher({
               className="w-full data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex justify-between items-center overflow-visible"
             >
               {/* Logo */}
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
-              </div>
+             
 
               {/* Nombre y plan */}
               <div className="flex flex-col flex-1 text-left text-sm leading-tight ml-2">
