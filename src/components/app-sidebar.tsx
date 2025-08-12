@@ -3,7 +3,6 @@
 import * as React from "react"
 import {
   BookOpen,
-  Bot,
   Frame,
   GalleryVerticalEnd,
   Map,
@@ -55,28 +54,19 @@ const data = {
           title: "Settings",
            url: "/dashboard/Settings",
         },
-       
-      ],
-    },
-    {
-      title: "Notificaciones",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
+
+         {
           title: "Enviado",
           url: "#",
         },
         {
-          title: "Bandeja de entrada",
-          url: "#",
+          title: "Correo",
+          url: "/dashboard/Bandeja",
         },
-        {
-          title: "Eliminados",
-          url: "#",
-        },
+       
       ],
     },
+    
     {
       title: "Planeamiento",
       url: "#",
