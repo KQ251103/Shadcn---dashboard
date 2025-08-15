@@ -4,9 +4,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
 import cors from 'cors';
-import productRoutes from './routes/productRoutes.js';
 import personRoutes from './routes/personRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
+import emailRoutes from './routes/emailRoutes.js';
 
 config(); // carga las variables de entorno
 
@@ -18,8 +18,8 @@ app.use(cors());
 app.use(express.json());
 
 // Rutas de productos
+app.use('/api/email', emailRoutes);
 app.use('/api/personas', personRoutes);
-app.use('/api/products', productRoutes);
 app.use('/api/projects', projectRoutes);
 
 // Ruta de prueba

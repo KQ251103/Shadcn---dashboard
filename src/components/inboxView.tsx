@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useState } from "react"
 
 interface Email {
-  id: number
+  _id: string
   sender: string
   senderEmail: string
   subject: string
@@ -22,9 +22,9 @@ interface Email {
 
 interface InboxViewProps {
   emails: Email[]
-  onPin: (emailId: number) => void
-  onArchive: (emailId: number) => void
-  onDelete: (emailId: number) => void
+  onPin: (emailId: string) => void
+  onArchive: (emailId: string) => void
+  onDelete: (emailId: string) => void
 }
 
 export function InboxView({ emails, onPin, onArchive, onDelete }: InboxViewProps) {
@@ -77,7 +77,7 @@ export function InboxView({ emails, onPin, onArchive, onDelete }: InboxViewProps
         ) : (
           sortedEmails.map((email) => (
             <div
-              key={email.id}
+              key={email._id}
               className={`border-b border-border p-4 hover:bg-muted/50 cursor-pointer transition-colors ${
                 !email.isRead ? "bg-muted/30" : ""
               } ${email.isPinned ? "bg-blue-50 dark:bg-blue-900/20" : ""}`}
@@ -121,21 +121,21 @@ export function InboxView({ emails, onPin, onArchive, onDelete }: InboxViewProps
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-popover border-border">
                           <DropdownMenuItem
-                            onClick={() => onPin(email.id)}
+                            onClick={() => onPin(email._id)}
                             className="text-popover-foreground hover:bg-accent focus:bg-accent"
                           >
                             <Pin className="w-4 h-4 mr-2" />
                             {email.isPinned ? "Desfijar" : "Fijar"}
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => onArchive(email.id)}
+                            onClick={() => onArchive(email._id)}
                             className="text-popover-foreground hover:bg-accent focus:bg-accent"
                           >
                             <Archive className="w-4 h-4 mr-2" />
                             Archivar
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => onDelete(email.id)}
+                            onClick={() => onDelete(email._id)}
                             className="text-popover-foreground hover:bg-accent focus:bg-accent"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />

@@ -8,8 +8,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useState } from "react"
 
+
+
 interface Email {
-  id: number
+  _id: string
   sender: string
   senderEmail: string
   subject: string
@@ -22,8 +24,8 @@ interface Email {
 
 interface EliminadosProps {
   deletedEmails: Email[]
-  onRestore: (emailId: number) => void
-  onPermanentDelete: (emailId: number) => void
+  onRestore: (emailId: string) => void
+  onPermanentDelete: (emailId: string) => void
 }
 
 export function Eliminados({ deletedEmails, onRestore, onPermanentDelete }: EliminadosProps) {
@@ -70,7 +72,7 @@ export function Eliminados({ deletedEmails, onRestore, onPermanentDelete }: Elim
         ) : (
           filteredEmails.map((email) => (
             <div
-              key={email.id}
+              key={email._id}
               className="border-b border-border p-4 hover:bg-muted/50 cursor-pointer transition-colors bg-red-50 dark:bg-red-900/10"
             >
               <div className="flex items-start gap-4">
@@ -103,14 +105,14 @@ export function Eliminados({ deletedEmails, onRestore, onPermanentDelete }: Elim
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-popover border-border">
                           <DropdownMenuItem
-                            onClick={() => onRestore(email.id)}
+                            onClick={() => onRestore(email._id)}
                             className="text-foreground hover:bg-accent focus:bg-accent"
                           >
                             <RotateCcw className="w-4 h-4 mr-2" />
                             Restaurar
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => onPermanentDelete(email.id)}
+                            onClick={() => onPermanentDelete(email._id)}
                             className="text-red-600 hover:bg-accent focus:bg-accent"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />

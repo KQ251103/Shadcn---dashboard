@@ -59,7 +59,7 @@ export default function ProjectCalendarView() {
       : []
 
 
-      type NewProjectForm = Omit<Project, "_id" | "createdAt">;
+  type NewProjectForm = Omit<Project, "_id" | "createdAt">;
 
   const handleAddProject = async () => {
     
