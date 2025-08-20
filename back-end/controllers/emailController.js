@@ -134,5 +134,18 @@ export const searchEmails = async (req, res) => {
         res.status(500).json({ message: 'Error al buscar correos electrónicos' });
     }
 };
+export const togglePinEmail = async (req, res) =>{
+    try{
+        const {id} = req.params;
+        const email = await Email.findById(id);
+        if(!email)
+            return res.status(404).json({error:"Email no encontrado"});
+        email.isPinned = !email.isPinned;
+        await email.save();
 
-
+        res.json({email});
+    }catch(error){
+        console.error("Error al fijar correo:",error);
+        res.status(505).json({error:"Error al fijar correo electronico"})
+    }
+}

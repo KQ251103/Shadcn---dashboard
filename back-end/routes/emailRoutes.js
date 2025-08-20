@@ -9,7 +9,8 @@ import {
     searchEmails,
     archiveEmail,
     moveToTrash,
-    restoreEmail
+    restoreEmail,
+    togglePinEmail
 } from '../controllers/emailController.js';
 const router = express.Router();
 router.get("/inbox", getInboxEmails);
@@ -22,4 +23,5 @@ router.get('/search', searchEmails);
 router.patch('/:id/archive', archiveEmail);
 router.patch('/:id/trash', moveToTrash);
 router.patch('/:id/restore', restoreEmail);
+router.patch('/:id/pin', togglePinEmail);
 export default router;

@@ -25,10 +25,21 @@ export default function DashboardPage() {
   const [currentView, setCurrentView] = useState<"inbox" | "deleted" | "archived">("inbox")
   
 
-  const handlePin = (emailId: string) => {
-    setEmails(emails.map((email) => (email._id === emailId ? { ...email, isPinned: !email.isPinned } : email)))
-    
-  }
+  const handlePin = async (emailId: string) => {
+    try{
+      const response = await fetch(`http://localhost:5000/api/email/${emailId}/pin`,{
+        method:"PATCH",
+      })
+      if(!response.ok){
+        throw new Error("Error al fijar correo electronico");
+      }
+      const updatedEmail = await response.json();
+      setEmails(emails.map((email) => email._id === emailId ? updatedEmail.email : email));
+    }catch(error){
+      console.error("Error al fijar correo electronico: ", error);
+      alert("No se pudo fijar el correo. Intenta de nuevo.")
+    } 
+  };
   
 
   const handleArchive = async (emailId: string) => {
