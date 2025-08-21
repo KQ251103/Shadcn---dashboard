@@ -1,15 +1,16 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 80eec6a4e1f43b7b4cc8ba7f34fd8228f6b18f01
 "use client"
-
-
 
 import { Archivados } from "@/components/archivados"
 import { Eliminados } from "@/components/eliminados"
 import { InboxView } from "@/components/inboxView"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface Email {
-  id: number
+  _id: string
   sender: string
   senderEmail: string
   subject: string
@@ -20,113 +21,172 @@ interface Email {
   hasAttachment: boolean
 }
 
-const initialEmails: Email[] = [
-  {
-    id: 1,
-    sender: "GitHub",
-    senderEmail: "noreply@github.com",
-    subject: "Your weekly digest",
-    preview: "Here are the highlights from your repositories this week...",
-    time: "2 min ago",
-    isRead: false,
-    isPinned: false,
-    hasAttachment: false,
-  },
-  {
-    id: 2,
-    sender: "Vercel",
-    senderEmail: "team@vercel.com",
-    subject: "Deployment successful",
-    preview: "Your application has been successfully deployed to production...",
-    time: "1 hour ago",
-    isRead: true,
-    isPinned: false,
-    hasAttachment: false,
-  },
-  {
-    id: 3,
-    sender: "Linear",
-    senderEmail: "notifications@linear.app",
-    subject: "Issue assigned to you",
-    preview: "A new issue has been assigned to you in the Design System project...",
-    time: "3 hours ago",
-    isRead: false,
-    isPinned: false,
-    hasAttachment: true,
-  },
-  {
-    id: 4,
-    sender: "Figma",
-    senderEmail: "hello@figma.com",
-    subject: "New comment on your design",
-    preview: "Sarah left a comment on your latest design file...",
-    time: "5 hours ago",
-    isRead: true,
-    isPinned: false,
-    hasAttachment: false,
-  },
-  {
-    id: 5,
-    sender: "Slack",
-    senderEmail: "notifications@slack.com",
-    subject: "Daily digest from #general",
-    preview: "You have 12 new messages in your workspace...",
-    time: "1 day ago",
-    isRead: true,
-    isPinned: false,
-    hasAttachment: false,
-  },
-]
-
 export default function DashboardPage() {
-  const [emails, setEmails] = useState<Email[]>(initialEmails)
+  const [emails, setEmails] = useState<Email[]>([])
   const [deletedEmails, setDeletedEmails] = useState<Email[]>([])
   const [archivedEmails, setArchivedEmails] = useState<Email[]>([])
+  
   const [currentView, setCurrentView] = useState<"inbox" | "deleted" | "archived">("inbox")
+  
 
-  const handlePin = (emailId: number) => {
-    setEmails(emails.map((email) => (email.id === emailId ? { ...email, isPinned: !email.isPinned } : email)))
-  }
+  const handlePin = async (emailId: string) => {
+    try{
+      const response = await fetch(`http://localhost:5000/api/email/${emailId}/pin`,{
+        method:"PATCH",
+      })
+      if(!response.ok){
+        throw new Error("Error al fijar correo electronico");
+      }
+      const updatedEmail = await response.json();
+      setEmails(emails.map((email) => email._id === emailId ? updatedEmail.email : email));
+    }catch(error){
+      console.error("Error al fijar correo electronico: ", error);
+      alert("No se pudo fijar el correo. Intenta de nuevo.")
+    } 
+  };
+  
 
-  const handleArchive = (emailId: number) => {
-    const emailToArchive = emails.find((email) => email.id === emailId)
-    if (emailToArchive) {
-      setArchivedEmails([...archivedEmails, emailToArchive])
-      setEmails(emails.filter((email) => email.id !== emailId))
+  const handleArchive = async (emailId: string) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/email/${emailId}/archive`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isArchived: true })
+    });
+    if (!response.ok) {
+      throw new Error("Error al archivar correo electrónico");
     }
+    const updatedEmail = await response.json();
+    setArchivedEmails([...archivedEmails, updatedEmail.email]);
+    setEmails(emails.filter((email) => email._id !== emailId));
+  } catch (error) {
+    console.error("Error al archivar correo electrónico:", error);
+    alert("No se pudo archivar correctamente el correo electrónico. Por favor, inténtalo de nuevo.");
   }
-
-  const handleDelete = (emailId: number) => {
-    const emailToDelete = emails.find((email) => email.id === emailId)
-    if (emailToDelete) {
-      setDeletedEmails([...deletedEmails, emailToDelete])
-      setEmails(emails.filter((email) => email.id !== emailId))
+};
+useEffect(() => {
+  const fetchArchivedEmails = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/email/archived`);
+      const data = await res.json();
+      setArchivedEmails(data);
+    } catch (error) {
+      console.error("Error al obtener correos archivados:", error);
     }
-  }
+  };
+  fetchArchivedEmails();
+}, []);
 
-  const handleRestore = (emailId: number) => {
-    const emailToRestore = deletedEmails.find((email) => email.id === emailId)
-    if (emailToRestore) {
-      setEmails([...emails, emailToRestore])
-      setDeletedEmails(deletedEmails.filter((email) => email.id !== emailId))
+  const handleDelete = async (emailId: string) => {
+    try{
+      const response = await fetch(`http://localhost:5000/api/email/${emailId}/trash`,{
+        method:"PATCH",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({status:"trash"})
+      });
+      if(!response.ok){
+        throw new Error("Error al mover correo electronico a eliminados");
+      }
+      const updatedEmail = await response.json();
+      setDeletedEmails([...deletedEmails, updatedEmail.email])
+      setEmails(emails.filter((email) => email._id !== emailId))
+    }catch(error){
+      console.error("Error al eliminar correo electronico:",error);
+      alert("No se pudo eliminar correctamente el correo electronico. Por favor, intentelo de nuevo.")
     }
-  }
 
-  const handleRestoreArchived = (emailId: number) => {
-    const emailToRestore = archivedEmails.find((email) => email.id === emailId)
-    if (emailToRestore) {
-      setEmails([...emails, emailToRestore])
-      setArchivedEmails(archivedEmails.filter((email) => email.id !== emailId))
+  }
+  useEffect(() => {
+  const fetchEliminatedEmails = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/email/deleted`);
+      const data = await res.json();
+      setDeletedEmails(data);
+    } catch (error) {
+      console.error("Error al obtener correos archivados:", error);
     }
+  };
+  fetchEliminatedEmails();
+}, []);
+
+  const handleRestore = async (emailId: string) => {
+    try{
+      const response=await fetch(`http://localhost:5000/api/email/${emailId}/restore`,{
+        method:"PATCH",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({status:"inbox"})
+      });
+      if(!response.ok){
+        throw new Error("Error al restaurar correo electronico");
+      }
+      const updatedEmail = await response.json();
+      setEmails([...emails, updatedEmail.email])
+      setDeletedEmails(deletedEmails.filter((email) => email._id !== emailId))
+    }catch(error){
+      console.error("Error al restaura correo electronico:",error);
+      alert("No se pudo restaurar el correo electronico. Por favor, intentelo de nuevo.");
+    }
+  };
+
+  const handleRestoreArchived = async (emailId: string) => {
+    try{
+      const response = await fetch(`http://localhost:5000/api/email/${emailId}/restore`,{
+        method:"PATCH",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({status:"inbox"})
+      })
+      if(!response.ok){
+        throw new Error("Error al restaurar correo");
+      }
+      const updatedEmail = await response.json();
+      setEmails([...emails, updatedEmail.email || updatedEmail]);
+      setArchivedEmails(archivedEmails.filter((email) => email._id !== emailId))
+    }catch(error){
+      console.error("Error al restaurar correo:",error);
+      alert("No se pudo restaurar el correo. Por favor, inténtalo de nuevo.")
+    }
+  };
+
+  const handlePermanentDelete = async (emailId: string) => {
+    try{
+      const response = await fetch(`http://localhost:5000/api/email/${emailId}`,{
+        method:"DELETE"
+      });
+      if(!response.ok){
+        throw new Error("Error al eliminar correo definitivamente");
+      }
+      setDeletedEmails(deletedEmails.filter((email) => email._id !== emailId));
+    }catch(error){
+      console.error("Error al eliminar correo:",error);
+      alert("No se pudo eliminar el correo definitivamente. Por favor, intentalo de nuevo.");
+    }
+    
   }
 
-  const handlePermanentDelete = (emailId: number) => {
-    setDeletedEmails(deletedEmails.filter((email) => email.id !== emailId))
+  const handlePermanentDeleteArchived = async (emailId: string) => {
+    try{
+      const response = await fetch(`http://localhost:5000/api/email/${emailId}`,{
+        method:"DELETE"
+      });
+      if(!response.ok){
+        throw new Error("Error al eliminar correo electronico permanentemente");
+      }
+      setArchivedEmails(archivedEmails.filter((email) => email._id !== emailId));
+    }catch(error){
+      console.error("Error al eliminar correo electronico permanentemente", error);
+      alert("No se pudo eliminar perminentemente el correo eletronico. Por favor, intentalo de nuevo.")
+    }
+    
   }
-
-  const handlePermanentDeleteArchived = (emailId: number) => {
-    setArchivedEmails(archivedEmails.filter((email) => email.id !== emailId))
-  }
+  
+  useEffect(()=>{
+    const fetchEmail = async () =>{
+      const res  = await fetch("http://localhost:5000/api/email/inbox")
+      const data = await res.json()
+      setEmails(data)
+      }
+      fetchEmail()
+  },[]);
 
   return (
     <div className="h-screen bg-background">
