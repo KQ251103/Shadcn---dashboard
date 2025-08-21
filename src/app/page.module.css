@@ -1,0 +1,16 @@
+.xd{
+    font-size: 2rem;
+    font-weight: bold;
+    color: red;
+}
+
+.xddd{
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: blue;
+}
+
+.xddd:hover {
+    color: red;
+    transform: scale(1.1);
+}
