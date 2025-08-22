@@ -65,6 +65,12 @@ const data = {
           title: "Proyectos",
           url: "/dashboard/Proyectos",
         },
+        {
+          title: "Anuncios",
+          url: "/dashboard/Anuncios",
+        },
+
+
       ],
     },
     
