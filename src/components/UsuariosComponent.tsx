@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Eye, EyeOff, Edit, Trash2, Plus, MessageCircle, Send } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,7 +14,7 @@ interface UsuariosComponentProps {
 }
 
 interface User {
-  id: number
+  _id: number
   name: string
   email: string
   password: string
@@ -24,44 +24,7 @@ interface User {
 }
 
 export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      name: "Juan Pérez",
-      email: "juan@empresa.com",
-      password: "admin123",
-      isOnline: true,
-      lastSeen: "Ahora",
-      role: "Admin",
-    },
-    {
-      id: 2,
-      name: "María García",
-      email: "maria@empresa.com",
-      password: "user456",
-      isOnline: false,
-      lastSeen: "Hace 5 minutos",
-      role: "Usuario",
-    },
-    {
-      id: 3,
-      name: "Carlos López",
-      email: "carlos@empresa.com",
-      password: "pass789",
-      isOnline: true,
-      lastSeen: "Ahora",
-      role: "Moderador",
-    },
-    {
-      id: 4,
-      name: "Ana Martín",
-      email: "ana@empresa.com",
-      password: "secure321",
-      isOnline: false,
-      lastSeen: "Hace 2 horas",
-      role: "Usuario",
-    },
-  ])
+  const [users, setUsers] = useState<User[]>([])
 
   const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>({})
   const [editingUser, setEditingUser] = useState<User | null>(null)
@@ -80,27 +43,36 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
 
   const handleSaveEdit = () => {
     if (editingUser) {
-      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? editingUser : u)))
+      setUsers((prev) => prev.map((u) => (u._id === editingUser._id ? editingUser : u)))
       setEditingUser(null)
     }
   }
 
-  const handleAddUser = () => {
-    const id = Math.max(...users.map((u) => u.id)) + 1
-    setUsers((prev) => [
-      ...prev,
-      {
-        ...newUser,
-        id,
-        isOnline: false,
-        lastSeen: "Nunca",
-      },
-    ])
-    setNewUser({ name: "", email: "", password: "", role: "Usuario" })
+  const handleAddUser = async () => {
+    try{
+      const response = await fetch("http://localhost:5000/api/usuario",{
+        method:"POST",
+        headers:{
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser)
+      })
+      if(!response.ok){
+        throw new Error("Error al crear el usuario")
+      }
+      const usuarioData = await response.json();
+      setUsers((prev)=>[...prev, usuarioData.usuario]);
+      alert("Usuario creado exitosamente")
+      setNewUser({ name: "", email: "", password: "", role: "Admin" })
+    }catch(error){
+      console.error("Error al agregar el usuario:",error);
+      alert("no se pudo agregar el usuario. Por favor, intentalo de nuevo.")
+    }
+   
   }
 
   const handleDeleteUser = (userId: number) => {
-    setUsers((prev) => prev.filter((u) => u.id !== userId))
+    setUsers((prev) => prev.filter((u) => u._id !== userId))
   }
 
   const handleSendMessage = () => {
@@ -115,6 +87,14 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
   const onlineUsers = users.filter((u) => u.isOnline)
   const offlineUsers = users.filter((u) => !u.isOnline)
 
+  useEffect(()=>{
+    const fetchUsuario = async ()=>{
+      const res = await fetch("http://localhost:5000/api/usuario")
+      const data = await res.json()
+      setUsers(data)
+    }
+    fetchUsuario()
+  },[]);
   return (
     <div className="p-6 bg-background min-h-screen">
       <div className="max-w-6xl mx-auto">
@@ -216,16 +196,16 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
                 </thead>
                 <tbody>
                   {users.map((user) => (
-                    <tr key={user.id} className="border-b border-border hover:bg-accent/50">
+                    <tr key={user._id} className="border-b border-border hover:bg-accent/50">
                       <td className="p-3 text-card-foreground">{user.name}</td>
                       <td className="p-3 text-card-foreground">{user.email}</td>
                       <td className="p-3">
                         <div className="flex items-center space-x-2">
                           <span className="text-card-foreground">
-                            {showPasswords[user.id] ? user.password : "••••••••"}
+                            {showPasswords[user._id] ? user.password : "••••••••"}
                           </span>
-                          <Button variant="ghost" size="sm" onClick={() => togglePasswordVisibility(user.id)}>
-                            {showPasswords[user.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          <Button variant="ghost" size="sm" onClick={() => togglePasswordVisibility(user._id)}>
+                            {showPasswords[user._id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </Button>
                         </div>
                       </td>
@@ -306,7 +286,7 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDeleteUser(user.id)}
+                            onClick={() => handleDeleteUser(user._id)}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -330,7 +310,7 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
               </h2>
               <div className="space-y-3">
                 {onlineUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 bg-accent/30 rounded-lg">
+                  <div key={user._id} className="flex items-center justify-between p-3 bg-accent/30 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       <div>
@@ -356,7 +336,7 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
               </h2>
               <div className="space-y-3">
                 {offlineUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 bg-accent/30 rounded-lg">
+                  <div key={user._id} className="flex items-center justify-between p-3 bg-accent/30 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                       <div>

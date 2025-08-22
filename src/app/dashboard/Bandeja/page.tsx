@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 
-=======
->>>>>>> 80eec6a4e1f43b7b4cc8ba7f34fd8228f6b18f01
 "use client"
 
 import { Archivados } from "@/components/archivados"

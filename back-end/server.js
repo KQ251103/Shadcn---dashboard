@@ -7,6 +7,7 @@ import cors from 'cors';
 import personRoutes from './routes/personRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import emailRoutes from './routes/emailRoutes.js';
+import usuarioRoutes from './routes/usuarioRoutes.js';
 //import formRoutes from './routes/formRoutes.js';
 
 config(); // carga las variables de entorno
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use('/api/email', emailRoutes);
 app.use('/api/personas', personRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/usuario', usuarioRoutes);
 //app.use('/api/form', formRoutes);
 
 // Ruta de prueba
