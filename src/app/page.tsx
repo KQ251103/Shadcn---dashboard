@@ -11,7 +11,7 @@ export default function Home() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/login", { // ajusta puerto/URL
+      const res = await fetch("http://localhost:5000/api/form/login", { // ajusta puerto/URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -37,29 +37,31 @@ export default function Home() {
   };
   return (
     
-      <div className={styles.bodyy}>   
+     <div className={styles.bodyy}>   
      <div className={styles.login}>
     <h2 className={styles.h2}>Login</h2>
-    <form action="#" className={styles.form}>
+    <form className={styles.form} onSubmit={handleSubmit} >
 
       <div className={styles.inputt}>
-        <input type="email"  placeholder=" "  required minLength={3} maxLength={20} className={styles.inputField}/>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+        placeholder=""  
+        required minLength={3} maxLength={20} className={styles.inputField}/>
         <label className={styles.label}>Email</label>
         </div>
 
         <div className={styles.inputt}>
-        <input type="password" required minLength={3} maxLength={20}  placeholder=" " className={styles.inputField}/>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+        required minLength={3} maxLength={20}  placeholder=" " className={styles.inputField}/>
         <label  className={styles.label}>Password</label>
       </div>
 
-        <button type="submit" className={styles.button}>Sing In</button>
+        <button type="submit" className={styles.button}>Sign In</button>
 
-      
     </form>
     
-    </div> 
-    
-   </div>
+    </div> 
+    
+   </div>
     
 
    
