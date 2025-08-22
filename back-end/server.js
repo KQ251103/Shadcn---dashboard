@@ -24,8 +24,8 @@ app.use('/api/email', emailRoutes);
 app.use('/api/personas', personRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/usuario', usuarioRoutes);
-app.use('/api/form', formRoutes);
 
+app.use('/api/form', formRoutes);
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente ✅');

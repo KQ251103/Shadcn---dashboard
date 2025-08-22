@@ -6,6 +6,6 @@ const  usuarioSchema = new mongoose.Schema({
     password :{type: String, required: true},
     isOnline :{type: Boolean, required: true, default:false},
     lastSeen :{type: String, required: true, default: Date.now},
-    role :{type: String, enum:['Usuario','Admin','Moderador'], default:"Admin"}
+    role :{type: String, enum:['Usuario','Admin'], default:"Admin"}
 },{timestamps: true});
 export const Usuario = mongoose.model("Usuario", usuarioSchema);
