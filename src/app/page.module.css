@@ -1,16 +1,112 @@
-.xd{
-    font-size: 2rem;
-    font-weight: bold;
-    color: red;
+.bodyy {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1f293a, #0f172a);
+  font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh;
 }
 
-.xddd{
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: blue;
+
+
+.login {
+  background: rgba(31, 41, 58, 0.9);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  width: 400px;
+  position: relative;
 }
 
-.xddd:hover {
-    color: red;
-    transform: scale(1.1);
+.h2 {
+  font-size: 2.5rem;
+  color: #0ef;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 800;
 }
+
+.form {
+  width: 100%;
+}
+
+.inputt {
+  position: relative;
+  margin: 30px 0;
+}
+
+.inputField {
+  width: 100%;
+  height: 50px;
+  background-color: transparent;
+  border: 2px solid #2c4766;
+  outline: none;
+  border-radius: 40px;
+  color: #fff;
+  padding: 0 20px;
+  transition: 0.3s ease;
+}
+
+/* Input focus y hover */
+.inputField:hover {
+  border-color: #0ef;
+  box-shadow: 0 0 8px #0ef3;
+}
+
+.inputField:focus {
+  border-color: #0ef;
+  box-shadow: 0 0 12px #0ef5;
+}
+
+.label {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 1rem;
+  pointer-events: none;
+  transition: 0.3s ease;
+}
+
+/* Label flotante */
+.inputField:focus ~ .label,
+.inputField:not(:placeholder-shown) ~ .label {
+  top: 0;
+  left: 15px;
+  font-size: 0.8rem;
+  color: #0ef;
+  background: #1f293a;
+  padding: 0 5px;
+  border-radius: 5px;
+}
+
+.button {
+  width: 100%;
+  height: 45px;
+  background: #0ef;
+  border: none;
+  outline: none;
+  border-radius: 40px;
+  font-weight: 600;
+  color: #1f293a;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+
+
+/* Pequeños detalles de decoración */
+.span {
+  position: absolute;
+  width: 32px;
+  height: 6px;
+  background-color: #0ef;
+  left: 0;
+  border-radius: 50%;
+  transform-origin: 128px;
+  transform: scale(2.2) rotate(calc(var(--i) * 360deg / 50));
+}
+
