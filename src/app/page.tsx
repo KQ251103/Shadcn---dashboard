@@ -10,7 +10,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
   try{
-    const response = await fetch("http://localhost:5000/api/form", {
+    const response = await fetch("http://localhost:5000/api/form/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,7 +23,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       return;
     }
     localStorage.setItem("token", data.token);
-    alert("Login successful");
+    
     window.location.href = "./dashboard";
   }catch{
     alert("Login failed");

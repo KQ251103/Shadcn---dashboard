@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Form from "../models/user.js"; // Asegúrate de que la ruta al modelo sea correcta
+import {Form} from "../models/user.js"; // Asegúrate de que la ruta sea correcta
 
 // Registro de usuario
 export const registerForm = async (req, res) => {
