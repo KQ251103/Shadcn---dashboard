@@ -2,16 +2,12 @@
 
 import * as React from "react"
 import {
-
-  GalleryVerticalEnd,
- 
-
   SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 
-import { NavUser } from "@/components/nav-user"
+
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
@@ -24,18 +20,11 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "Kevin",
-    email: "mccc@example.com",
+    name: "Kevin Quinto Cano",
+    email: "Kev25@gmail.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
-    {
-      name: "Kevin",
-      logo: GalleryVerticalEnd,
-      plan: "mccc@example.com",
-      url: "/dashboard",
-    }
-  ],
+ 
   navMain: [
     {
       title: "General",
@@ -84,8 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-         <NavUser user={data.user} />
+        <TeamSwitcher user={data.user} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />   

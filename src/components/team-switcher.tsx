@@ -1,105 +1,61 @@
 "use client"
+import { MoreVertical, LogOut } from "lucide-react"
 
-import * as React from "react"
-
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ModeToggle } from "./mode-toggle"
 
 export function TeamSwitcher({
-  teams,
+  user = { name: "Kevin", email: "mccc@exampleeeeee.com" },
 }: {
-  teams: {
+  user?: {
     name: string
-    
-    logo: React.ElementType
-    plan: string
-  }[]
+    email: string
+  }
 }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
-
-  if (!activeTeam) {
-    return null
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
   }
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-         
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="w-full data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex justify-between items-center overflow-visible"
-            >
-              {/* Logo */}
-             
+    <div className="w-full mt-2">
+      <div className="w-full flex justify-between items-center ">
+        <div className="flex items-center">
+          <Avatar className="size-8 border-2 ml-2 border-black">
+            <AvatarFallback className="text-md font-extrabold">{getInitials(user.name)}</AvatarFallback>
+          </Avatar>
 
-              {/* Nombre y plan */}
-              <div className="flex flex-col flex-1 text-left text-sm leading-tight ml-2">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
-              </div>
+          <div className="flex flex-col flex-1 text-left text-sm leading-tight ml-2">
+            <span className="truncate font-medium">{user.name}</span>
+            <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+          </div>
+        </div>
 
-              {/* Wrapper del ModeToggle: parar propagation en varios eventos */}
-              <div
-                className="flex items-center justify-end ml-2 relative z-20"
-                onPointerDown={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                role="button"
-                tabIndex={0}
-              >
-                <ModeToggle />
-              </div>
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
+        <div className="flex   justify-end items-center ">
+          <ModeToggle />
 
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
-            </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-3.5 shrink-0" />
-                </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-auto p-1">
+                <MoreVertical className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-56 rounded-lg" align="end" side="bottom" sideOffset={4}>
+              <DropdownMenuItem className="gap-2 p-2 text-red-600 focus:text-red-600">
+                <LogOut className="size-4" />
+                Cerrar sesión
               </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            
-          </DropdownMenuContent>
-
-            
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </div>
   )
 }
