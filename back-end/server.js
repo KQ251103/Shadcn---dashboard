@@ -8,15 +8,14 @@ import personRoutes from './routes/personRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import emailRoutes from './routes/emailRoutes.js';
 import usuarioRoutes from './routes/usuarioRoutes.js';
-import formRoutes from './routes/formRoutes.js';
-
 config(); // carga las variables de entorno
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000" }));
+
 app.use(express.json());
 
 // Rutas de productos
@@ -25,8 +24,6 @@ app.use('/api/personas', personRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/usuario', usuarioRoutes);
 
-app.use('/api/form', formRoutes);
-// Ruta de prueba
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente ✅');
 });

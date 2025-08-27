@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useEffect } from "react"
 
 // Datos de métricas
 const metrics = [
@@ -147,9 +148,33 @@ const chartData = [
   { name: "Dec", total: 3400 },
 ]
 
+
 export default function Dashboard() {
   const maxValue = Math.max(...chartData.map((item) => item.total))
-
+  
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "/";
+    return;
+  }
+  
+  // Verificar token con el backend
+  fetch("http://localhost:5000/api/usuario/dashboard", {
+  headers: { Authorization: `Bearer ${token}` },
+})
+  .then(res => res.json())
+  .then(data => {
+    if (data.message !== "Acceso concedido al dashboard") {
+      localStorage.removeItem("token"); // token inválido → borrar
+      window.location.href = "/";
+    }
+  })
+  .catch(err => {
+    console.error("Error al acceder al dashboard:", err);
+    // No borramos token, solo logueamos el error
+  });
+}, []);
   return (
     <div className="min-h-screen bg-background">
       <div className="p-6 space-y-6">

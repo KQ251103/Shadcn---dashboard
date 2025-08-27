@@ -32,6 +32,11 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
   const [chatUser, setChatUser] = useState<User | null>(null)
   const [message, setMessage] = useState("")
   const [activeTab, setActiveTab] = useState<"all" | "online">("all")
+  const [usuarioActivo, setUsuarioActivo] = useState<User[]>([]);
+  const [usuarioInactivo, setUsuarioInactivo] = useState<User[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
 
   const togglePasswordVisibility = (userId: number) => {
     setShowPasswords((prev) => ({ ...prev, [userId]: !prev[userId] }))
@@ -41,10 +46,27 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
     setEditingUser({ ...user })
   }
 
-  const handleSaveEdit = () => {
-    if (editingUser) {
+  const handleSaveEdit = async () => {
+    if (!editingUser) return
+    try{
+      const response = await fetch(`http://localhost:5000/api/usuario/${editingUser._id}`,{
+        method:"PUT",
+        headers:{
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editingUser)
+      })
+      if(!response.ok){
+        throw new Error("Error al actualizar el usuario")
+      }
       setUsers((prev) => prev.map((u) => (u._id === editingUser._id ? editingUser : u)))
-      setEditingUser(null)
+      alert("Usuario actualizado exitosamente")
+      fetchUsuarioActividad();
+      setEditingUser(null);
+      setIsEditDialogOpen(false);
+    }catch(error){
+      console.error("Error al actualizar el usuario:",error);
+      alert("no se pudo actualizar el usuario. Por favor, intentalo de nuevo.")
     }
   }
 
@@ -64,15 +86,29 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
       setUsers((prev)=>[...prev, usuarioData.usuario]);
       alert("Usuario creado exitosamente")
       setNewUser({ name: "", email: "", password: "", role: "Admin" })
+      fetchUsuarioActividad();
+      setIsDialogOpen(false);
     }catch(error){
       console.error("Error al agregar el usuario:",error);
       alert("no se pudo agregar el usuario. Por favor, intentalo de nuevo.")
     }
-   
   }
 
-  const handleDeleteUser = (userId: number) => {
+  const handleDeleteUser = async (userId: number) => {
     setUsers((prev) => prev.filter((u) => u._id !== userId))
+    try{
+      const response = await fetch(`http://localhost:5000/api/usuario/${userId}`,{
+        method:"DELETE",
+      })
+      if(!response.ok){
+        throw new Error("Error al eliminar el usuario")
+      }
+      alert("Usuario eliminado exitosamente")
+      fetchUsuarioActividad();
+    }catch(error){
+      console.error("Error al eliminar el usuario:",error);
+      alert("no se pudo eliminar el usuario. Por favor, intentalo de nuevo.")
+    }
   }
 
   const handleSendMessage = () => {
@@ -83,10 +119,29 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
       setChatUser(null)
     }
   }
+  
+  const fetchUsuarioActividad = async () => {
+    try {
+      const [activosRes, inactivosRes] = await Promise.all([
+        fetch("http://localhost:5000/api/usuario/activo"),
+        fetch("http://localhost:5000/api/usuario/inactivo"),
+      ]);
+      if (!activosRes.ok || !inactivosRes.ok) {
+        throw new Error("Error al obtener usuarios");
+      }
+      const activo = await activosRes.json();
+      const inactivo = await inactivosRes.json();
+      setUsuarioActivo(Array.isArray(activo) ? activo : []);
+      setUsuarioInactivo(Array.isArray(inactivo) ? inactivo : []);
+    } catch (error) {
+      console.error("Error al cargar usuarios: ", error);
+      alert("Usuarios no cargados correctamente");
+    }
+  };
 
-  const onlineUsers = users.filter((u) => u.isOnline)
-  const offlineUsers = users.filter((u) => !u.isOnline)
-
+  useEffect(() => {
+    fetchUsuarioActividad();
+  }, []);
   useEffect(()=>{
     const fetchUsuario = async ()=>{
       const res = await fetch("http://localhost:5000/api/usuario")
@@ -124,7 +179,7 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
           <div className="bg-card border border-border rounded-lg p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-card-foreground">Gestión de Usuarios</h2>
-              <Dialog>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-primary text-primary-foreground">
                     <Plus className="h-4 w-4 mr-2" />
@@ -171,7 +226,6 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
                         className="w-full p-2 border border-border rounded-md bg-background text-foreground"
                       >
                         <option value="Usuario">Usuario</option>
-                        <option value="Moderador">Moderador</option>
                         <option value="Admin">Admin</option>
                       </select>
                     </div>
@@ -217,9 +271,9 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
                           <Button variant="ghost" size="sm" onClick={() => setChatUser(user)}>
                             <MessageCircle className="h-4 w-4" />
                           </Button>
-                          <Dialog>
+                          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                             <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
+                              <Button variant="ghost" size="sm" onClick={() =>{handleEditUser(user);setIsEditDialogOpen(true);} }>
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </DialogTrigger>
@@ -272,7 +326,6 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
                                       className="w-full p-2 border border-border rounded-md bg-background text-foreground"
                                     >
                                       <option value="Usuario">Usuario</option>
-                                      <option value="Moderador">Moderador</option>
                                       <option value="Admin">Admin</option>
                                     </select>
                                   </div>
@@ -301,15 +354,15 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
           </div>
         )}
 
-        {activeTab === "online" && (
+        {activeTab === "online" &&  (
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-lg p-6">
               <h2 className="text-xl font-semibold text-card-foreground mb-4 flex items-center">
                 <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                Usuarios en Línea ({onlineUsers.length})
+                Usuarios en Línea ({usuarioActivo.length})
               </h2>
               <div className="space-y-3">
-                {onlineUsers.map((user) => (
+                {usuarioActivo.map((user) => (
                   <div key={user._id} className="flex items-center justify-between p-3 bg-accent/30 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -332,10 +385,10 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
             <div className="bg-card border border-border rounded-lg p-6">
               <h2 className="text-xl font-semibold text-card-foreground mb-4 flex items-center">
                 <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                Usuarios Desconectados ({offlineUsers.length})
+                Usuarios Desconectados ({usuarioInactivo.length})
               </h2>
               <div className="space-y-3">
-                {offlineUsers.map((user) => (
+                {usuarioInactivo.map((user) => (
                   <div key={user._id} className="flex items-center justify-between p-3 bg-accent/30 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
