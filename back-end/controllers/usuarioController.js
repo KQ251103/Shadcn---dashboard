@@ -20,6 +20,7 @@ export const createUsuario = async(req, res) =>{
         res.status(500).json({message: ' Error al crear el usuario'});
     }
 }
+
 export const loginUsario = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -40,17 +41,18 @@ export const loginUsario = async (req, res) => {
     // Crear token JWT
     const SECRET = process.env.JWT_SECRET || "21-02-2023";
     const token = jwt.sign(
-        { id: usuario._id, email: usuario.email, role: usuario.role },
+        { id: usuario._id, email: usuario.email, name: usuario.name },
         SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "1h"}
     );
 
     res.status(200).json({
       msg: "✅ Usuario ha iniciado sesión correctamente",
       token,
       usuario: {
+        name: usuario.name,
         id: usuario._id,
-        email: usuario.email,
+        email: usuario.email
       },
     });
 
@@ -82,10 +84,7 @@ export const verifyToken = (req, res) => {
 export const getUsuarioActivo = async (req, res) => {
   try {
     const activos = await Usuario.find({ isOnline: true });
-    if (!activos || activos.length === 0) {
-      return res.status(404).json({ message: 'No hay usuarios activos' });
-    }
-    res.status(200).json(activos);
+    res.status(200).json(activos); // <-- siempre devuelve array (vacío o con datos)
   } catch (error) {
     console.error('Error al obtener los usuarios activos:', error);
     res.status(500).json({ message: 'Error al obtener los usuarios activos' });
@@ -95,15 +94,13 @@ export const getUsuarioActivo = async (req, res) => {
 export const getUsuarioInactivo = async (req, res) => {
   try {
     const inactivos = await Usuario.find({ isOnline: false });
-    if (!inactivos || inactivos.length === 0) {
-      return res.status(404).json({ message: 'No hay usuarios inactivos' });
-    }
-    res.status(200).json(inactivos);
+    res.status(200).json(inactivos); // <-- siempre devuelve array
   } catch (error) {
     console.error('Error al obtener los usuarios inactivos:', error);
     res.status(500).json({ message: 'Error al obtener los usuarios inactivos' });
   }
 };
+
 
 export const deleteUsuario = async (req, res) => {
   try {

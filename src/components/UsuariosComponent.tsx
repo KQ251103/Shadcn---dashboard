@@ -14,7 +14,7 @@ interface UsuariosComponentProps {
 }
 
 interface User {
-  _id: number
+  _id: string
   name: string
   email: string
   password: string
@@ -26,7 +26,7 @@ interface User {
 export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
   const [users, setUsers] = useState<User[]>([])
 
-  const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>({})
+  const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>({})
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "Usuario" })
   const [chatUser, setChatUser] = useState<User | null>(null)
@@ -38,7 +38,7 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
 
-  const togglePasswordVisibility = (userId: number) => {
+  const togglePasswordVisibility = (userId: string) => {
     setShowPasswords((prev) => ({ ...prev, [userId]: !prev[userId] }))
   }
 
@@ -81,7 +81,7 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
       })
       if(!response.ok){
         throw new Error("Error al crear el usuario")
-      }
+      }  
       const usuarioData = await response.json();
       setUsers((prev)=>[...prev, usuarioData.usuario]);
       alert("Usuario creado exitosamente")
@@ -93,8 +93,7 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
       alert("no se pudo agregar el usuario. Por favor, intentalo de nuevo.")
     }
   }
-
-  const handleDeleteUser = async (userId: number) => {
+  const handleDeleteUser = async (userId: string) => {
     setUsers((prev) => prev.filter((u) => u._id !== userId))
     try{
       const response = await fetch(`http://localhost:5000/api/usuario/${userId}`,{
@@ -121,23 +120,23 @@ export default function UsuariosComponent({ onBack }: UsuariosComponentProps) {
   }
   
   const fetchUsuarioActividad = async () => {
-    try {
-      const [activosRes, inactivosRes] = await Promise.all([
-        fetch("http://localhost:5000/api/usuario/activo"),
-        fetch("http://localhost:5000/api/usuario/inactivo"),
-      ]);
-      if (!activosRes.ok || !inactivosRes.ok) {
-        throw new Error("Error al obtener usuarios");
-      }
-      const activo = await activosRes.json();
-      const inactivo = await inactivosRes.json();
-      setUsuarioActivo(Array.isArray(activo) ? activo : []);
-      setUsuarioInactivo(Array.isArray(inactivo) ? inactivo : []);
-    } catch (error) {
-      console.error("Error al cargar usuarios: ", error);
-      alert("Usuarios no cargados correctamente");
+  try {
+    const [activosRes, inactivosRes] = await Promise.all([
+      fetch("http://localhost:5000/api/usuario/activo"),
+      fetch("http://localhost:5000/api/usuario/inactivo"),
+    ]);
+    if (!activosRes.ok || !inactivosRes.ok) {
+      throw new Error("Error al obtener usuarios");
     }
-  };
+    const activo = await activosRes.json();
+    const inactivo = await inactivosRes.json();
+    setUsuarioActivo(Array.isArray(activo) ? activo : []);
+    setUsuarioInactivo(Array.isArray(inactivo) ? inactivo : []);
+  } catch (error) {
+    console.error("Error al cargar usuarios: ", error);
+    alert("Usuarios no cargados correctamente");
+  }
+};
 
   useEffect(() => {
     fetchUsuarioActividad();

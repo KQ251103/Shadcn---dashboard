@@ -158,8 +158,6 @@ export default function Dashboard() {
     window.location.href = "/";
     return;
   }
-  
-  // Verificar token con el backend
   fetch("http://localhost:5000/api/usuario/dashboard", {
   headers: { Authorization: `Bearer ${token}` },
 })

@@ -26,7 +26,8 @@ export default function Home() {
       alert(data.msg || "Error en el login");
       return;
     }
-
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
     // ✅ Guardar token en localStorage
     localStorage.setItem("token", data.token);
 

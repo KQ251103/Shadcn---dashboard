@@ -1,11 +1,17 @@
 import mongoose from "mongoose";
 
 const personSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  role: { type: String },
+  usuario: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Usuario", 
+    required: true, 
+    unique: true 
+  },
+  name: { type: String, required: true },     // Se rellena desde Usuario
+  email: { type: String, required: true },    // Se rellena desde Usuario
+  role: { type: String, required: true },     // Solo de Persona
   department: { type: String },
   avatar: { type: String },
-  email: { type: String, required: true },
   phone: { type: String, required: true },
   location: { type: String },
   joinDate: { type: Date, default: Date.now },

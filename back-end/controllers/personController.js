@@ -36,15 +36,16 @@ export const getPersonById = async (req, res) => {
   }
 }
 export const createPerson = async (req, res) => {
-    try {
-        const person = new Person(req.body);
-        await person.save();
-        res.status(201).json({ message: 'Persona creada correctamente', person });
-    } catch (error) {
-        console.error('Error al crear la persona:', error);
-        res.status(500).json({ message: 'Error al crear la persona' });
-    }
+  try {
+    const person = new Person(req.body);
+    await person.save();
+    res.status(201).json({ person });
+  } catch (error) {
+    console.error("Error al crear persona:", error);
+    res.status(500).json({ message: "Error al crear persona", error: error.message });
+  }
 };
+
 export const updatePerson = async (req, res) => {
     try {
         const person = await Person.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -69,3 +70,16 @@ export const deletePerson = async (req, res) => {
         res.status(500).json({ message: 'Error al eliminar la persona' });
     }
 }
+export const getPersonaByUsuario = async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+    const persona = await Persona.findOne({ usuario: usuarioId }).populate("usuario", "_id name email role");
+    if (!persona) {
+      return res.status(404).json({ message: "Persona no encontrada" });
+    }
+    res.status(200).json(persona);
+  } catch (error) {
+    console.error("Error al obtener persona:", error);
+    res.status(500).json({ message: "Error interno", error: error.message });
+  }
+};

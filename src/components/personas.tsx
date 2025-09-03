@@ -43,10 +43,13 @@ const departments = [
   "Seguridad",
 ]
 
+//datos del localStorage
+const usuarioGuardado = JSON.parse(localStorage.getItem("usuario") || "{}");
+
 export default function Dashboard() {
-  const [personas, setPersonas] = useState<Person[]>([])
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null)
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [personas, setPersonas] = useState<Person[]>([]);
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [newPerson, setNewPerson] = useState({
     name: "",
     role: "",
@@ -58,6 +61,7 @@ export default function Dashboard() {
     skills: "",
     rating: 5,
     projects: 0,
+    usuarioId: usuarioGuardado.id || ""
   })
   const [searchTerm, setSearchTerm] = useState("")
   const [showEditModal, setShowEditModal] = useState(false)
@@ -75,7 +79,7 @@ export default function Dashboard() {
     projects: 0,
   })
   const [showEditOption, setShowEditOption] = useState<Person | null>(null)
-
+  
   const openModal = (person: Person) => {
     setSelectedPerson(person)
   }
@@ -85,7 +89,13 @@ export default function Dashboard() {
   }
 
   const openAddModal = () => {
-    setShowAddModal(true)
+    setNewPerson(prev => ({
+    ...prev,
+    name: usuarioGuardado.name || "",
+    email: usuarioGuardado.email || "",
+    usuarioId: usuarioGuardado.id || ""
+  }));
+  setShowAddModal(true);
   }
 
   const closeAddModal = () => {
@@ -101,6 +111,7 @@ export default function Dashboard() {
       skills: "",
       rating: 5,
       projects: 0,
+      usuarioId: usuarioGuardado.id || ""
     })
   }
 
@@ -120,11 +131,12 @@ export default function Dashboard() {
       .filter((skill) => skill.length > 0)
 
     const personToAdd = {
+      usuario: newPerson.usuarioId,
       name: newPerson.name,
+      email: newPerson.email,
       role: newPerson.role,
       department: newPerson.department,
       avatar: "/placeholder.svg?height=120&width=120",
-      email: newPerson.email,
       phone: newPerson.phone,
       location: newPerson.location,
       joinDate: new Date().toISOString().split("T")[0],
@@ -133,6 +145,7 @@ export default function Dashboard() {
       rating: newPerson.rating,
       projects: newPerson.projects,
     }
+    
 
     try {
       const response = await fetch("http://localhost:5000/api/personas", {
@@ -272,6 +285,8 @@ export default function Dashboard() {
       // si está vacío, carga todos
       const res = await fetch("http://localhost:5000/api/personas")
       const data = await res.json()
+      const usuario = localStorage.getItem("usuario");
+      console.log(usuario)
       setPersonas(data)
     } else {
       const response = await fetch(`http://localhost:5000/api/personas/search?query=${searchTerm}`)

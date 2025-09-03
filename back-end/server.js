@@ -8,6 +8,7 @@ import personRoutes from './routes/personRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import emailRoutes from './routes/emailRoutes.js';
 import usuarioRoutes from './routes/usuarioRoutes.js';
+//import perfilRoutes from './routes/perfilRoutes.js';
 config(); // carga las variables de entorno
 
 const app = express();
@@ -23,6 +24,7 @@ app.use('/api/email', emailRoutes);
 app.use('/api/personas', personRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/usuario', usuarioRoutes);
+//app.use('/api/perfil', perfilRoutes);
 
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente ✅');
