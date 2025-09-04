@@ -1,5 +1,7 @@
 import { Email } from '../models/email.js';
 
+
+
 export const getAllEmails = async (req, res) => {
   try {
     const emails = await Email.find(); 
@@ -147,5 +149,46 @@ export const togglePinEmail = async (req, res) =>{
     }catch(error){
         console.error("Error al fijar correo:",error);
         res.status(505).json({error:"Error al fijar correo electronico"})
+    }    
+}
+
+
+
+
+
+
+
+
+
+
+// Tipos de archivos permitidos
+export async function uploadFileController(req) {
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file");
+
+    if (!(file instanceof File)) {
+      return new Response(
+        JSON.stringify({ error: "No se envió ningún archivo válido" }),
+        { status: 400 }
+      );
     }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "Archivo recibido",
+        filename: file.name,
+        mimetype: file.type,
+        size: file.size,
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error al subir archivo:", error);
+    return new Response(
+      JSON.stringify({ error: "Error al procesar el archivo" }),
+      { status: 500 }
+    );
+  }
 }

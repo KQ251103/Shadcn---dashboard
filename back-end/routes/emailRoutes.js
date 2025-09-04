@@ -1,4 +1,5 @@
 import express from 'express';
+
 import {
     getInboxEmails,
     getArchivedEmails,
@@ -10,9 +11,12 @@ import {
     archiveEmail,
     moveToTrash,
     restoreEmail,
-    togglePinEmail
+    togglePinEmail,
+    uploadFileController
 } from '../controllers/emailController.js';
+
 const router = express.Router();
+router.post('/upload', uploadFileController);
 router.get("/inbox", getInboxEmails);
 router.get("/archived", getArchivedEmails);
 router.get("/deleted", getDeletedEmails);
