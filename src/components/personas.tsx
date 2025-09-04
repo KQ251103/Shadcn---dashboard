@@ -285,8 +285,7 @@ export default function Dashboard() {
       // si está vacío, carga todos
       const res = await fetch("http://localhost:5000/api/personas")
       const data = await res.json()
-      const usuario = localStorage.getItem("usuario");
-      console.log(usuario)
+      console.log(data)
       setPersonas(data)
     } else {
       const response = await fetch(`http://localhost:5000/api/personas/search?query=${searchTerm}`)
@@ -487,7 +486,7 @@ export default function Dashboard() {
                     value={newPerson.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
                     placeholder="Ej: Juan Pérez"
-                    required
+                    disabled
                   />
                 </div>
 
@@ -544,7 +543,7 @@ export default function Dashboard() {
                     value={newPerson.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     placeholder="Ej: juan.perez@empresa.com"
-                    required
+                    disabled
                   />
                 </div>
 

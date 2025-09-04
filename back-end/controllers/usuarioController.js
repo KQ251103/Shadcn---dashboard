@@ -10,6 +10,36 @@ export const getAllUsuario = async (req, res) => {
         res.status(500).json({message:'Error al obtener a los usuarios actuales'});
     }
 };
+export const getUsuario = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+      return res.status(401).json({ msg: "No autorizado, token requerido" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const SECRET = process.env.JWT_SECRET || "21-02-2023";
+
+    // Verificamos el token
+    const decoded = jwt.verify(token, SECRET);
+
+    // Buscamos usuario en la BD
+    const usuario = await Usuario.findById(decoded.id).select("name email");
+    if (!usuario) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    res.status(200).json({
+      name: usuario.name,
+      email: usuario.email
+    });
+
+  } catch (error) {
+    console.error("Error al obtener usuario:", error);
+    res.status(500).json({ msg: "Error en el servidor", error: error.message });
+  }
+};
+
 export const createUsuario = async(req, res) =>{
     try{
         const usuario = new Usuario(req.body);
@@ -129,5 +159,32 @@ export const updateUsuario = async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar el usuario:', error);
     res.status(500).json({ message: 'Error al actualizar el usuario' });
+  }
+};
+
+export const logoutUsuario = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+      return res.status(401).json({ msg: "No autorizado, token requerido" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const SECRET = process.env.JWT_SECRET || "21-02-2023";
+    const decoded = jwt.verify(token, SECRET);
+
+    const usuario = await Usuario.findById(decoded.id);
+    if (!usuario) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    usuario.isOnline = false;
+    usuario.lastSeen = new Date().toISOString();
+    await usuario.save();
+
+    return res.status(200).json({ msg: "✅ Sesión cerrada correctamente" });
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    return res.status(500).json({ msg: "❌ Error al cerrar sesión", error: error.message });
   }
 };

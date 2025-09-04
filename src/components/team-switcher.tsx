@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ModeToggle } from "./mode-toggle"
+import { useRouter } from "next/navigation"
 
 export function TeamSwitcher({
   user = { name: "Kevin", email: "mccc@exampleeeeee.com" },
@@ -21,6 +22,28 @@ export function TeamSwitcher({
       .join("")
       .toUpperCase()
       .slice(0, 2)
+  }
+  const router = useRouter()
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token")
+      if (token) {
+        await fetch("http://localhost:5000/api/usuario/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      }
+    } catch (error) {
+      console.error("Error en logout:", error)
+    } finally {
+      // Limpio token del localStorage
+      localStorage.removeItem("token")
+      // Redirijo al login
+      router.push("/")
+    }
   }
 
   return (
@@ -48,7 +71,7 @@ export function TeamSwitcher({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-56 rounded-lg" align="end" side="bottom" sideOffset={4}>
-              <DropdownMenuItem className="gap-2 p-2 text-red-600 focus:text-red-600">
+              <DropdownMenuItem className="gap-2 p-2 text-red-600 focus:text-red-600" onClick={handleLogout}>
                 <LogOut className="size-4" />
                 Cerrar sesión
               </DropdownMenuItem>

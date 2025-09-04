@@ -8,7 +8,9 @@ import {
     getUsuarioActivo,
     getUsuarioInactivo,
     deleteUsuario,
-    updateUsuario
+    updateUsuario,
+    getUsuario,
+    logoutUsuario
 }from '../controllers/usuarioController.js';
 const router = express.Router();
 router.get('/', getAllUsuario);
@@ -17,6 +19,8 @@ router.post('/login', loginUsario);
 router.get('/dashboard', verifyToken,(req, res) => {
     res.json({message: 'Acceso concedido al dashboard', user: req.user});
 });
+router.post('/logout', logoutUsuario);
+router.get('/me', getUsuario);
 router.get('/activo', getUsuarioActivo);
 router.get('/inactivo', getUsuarioInactivo);
 router.delete('/:id', deleteUsuario);

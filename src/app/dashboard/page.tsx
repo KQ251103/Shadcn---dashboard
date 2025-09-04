@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect } from "react"
 
 // Datos de métricas
@@ -258,7 +258,6 @@ export default function Dashboard() {
                 {recentSales.map((sale, index) => (
                   <div key={index} className="flex items-center">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src="/placeholder.svg" alt="Avatar" />
                       <AvatarFallback>{sale.initials}</AvatarFallback>
                     </Avatar>
                     <div className="ml-4 space-y-1">
