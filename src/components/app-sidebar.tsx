@@ -33,7 +33,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           { title: "Perfiles", url: "/dashboard/Perfiles" },
           { title: "Settings", url: "/dashboard/Settings" },
-          { title: "Enviado", url: "#" },
+          { title: "Enviado", url: "/dashboard/Enviado" },
           { title: "Correo", url: "/dashboard/Bandeja" },
           { title: "Proyectos", url: "/dashboard/Proyectos" },
           { title: "Anuncios", url: "/dashboard/Anuncios" },
